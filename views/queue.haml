@@ -1,0 +1,13 @@
+%h3 Queue list
+%br
+%a(href="/") Top
+%p
+%table
+  %tr
+    %th File
+    %th Transpose
+  - @queue.each do |q|
+    %tr
+      %td #{q[:file]}
+      %td #{q[:transporse]}
+

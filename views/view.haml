@@ -1,0 +1,28 @@
+%h3 Movie files in #{@top}/#{@entry}
+%br
+%a(href="/queue") Queue list
+%p
+%table
+  %tr
+  %td
+    %a(href="#{File.dirname('/view/'+@entry)}") Up
+  - @files.each do |file|
+    %tr
+      - full_path = [@top, @entry, file].join('/')
+      - if File.directory?(full_path)
+        %td
+          %a(href="/view/#{@entry}/#{file}") #{file}
+      - if file[/\.(mp4|3gp)$/]
+        %td
+          %a(href="/view/#{@entry}/#{file}") #{file}
+        %td
+          %img(src="/thumb/#{@entry}/#{file}" width="150")
+      - if file[/.MTS$/]
+        %td #{file}
+        %td
+          %img(src="/thumb/#{@entry}/#{file}" width="150")
+        %td
+          %a(href="/conv/#{@entry}/#{file}\?transpose=2") Left
+          %a(href="/conv/#{@entry}/#{file}") Normal
+          %a(href="/conv/#{@entry}/#{file}\?transpose=1") Right
+
