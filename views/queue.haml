@@ -5,9 +5,13 @@
 %table
   %tr
     %th File
+    %th Image
     %th Transpose
   - @queue.each do |q|
     %tr
-      %td #{q[:file]}
-      %td #{q[:transporse]}
-
+      %td
+        #{q[:file]}
+      %td
+        %img(src="/thumb/#{q[:file]}" width="150")
+      %td
+        #{transpose_num_to_str(q[:transpose])}

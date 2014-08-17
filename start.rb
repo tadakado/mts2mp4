@@ -9,23 +9,39 @@ TOP='/home/share/media/movie'
 require 'thread'
 
 queue = Queue.new
+queue_list = []
 thread = Thread.start do
   while target = queue.pop
+    queue_list.pop
     puts '============================================================'
     puts 'Converting : ' + target[:file]
+    puts 'Transpose  : ' + transpose_num_to_str(target[:transpose])
     puts '============================================================'
     mp4file = "/tmp/avconv/" + File.basename(target[:file]).sub(/MTS/, 'mp4')
     if target[:transpose]
-      command = "avconv -i #{target[:file]} -y -vf transpose=#{target[:transpose]} -strict experimental #{mp4file}"
+      command = "avconv -i #{TOP}/#{target[:file]} -y -vf transpose=#{target[:transpose]} -strict experimental #{mp4file}"
     else
-      command = "avconv -i #{target[:file]} -y -strict experimental #{mp4file}"
+      command = "avconv -i #{TOP}/#{target[:file]} -y -strict experimental #{mp4file}"
     end
     command = ["mkdir /tmp/avconv",
                command,
-               "touch -r #{target[:file]} #{mp4file}",
-               "mv -f #{mp4file} #{target[:file].sub(/MTS/, 'mp4')}",
+               "touch -r #{TOP}/#{target[:file]} #{mp4file}",
+               "mv -f #{mp4file} #{TOP}/#{target[:file].sub(/MTS/, 'mp4')}",
                "rmdir /tmp/avconv"].join(";")
     system(command)
+  end
+end
+
+##### func #####
+
+def transpose_num_to_str(num)
+  case num
+  when '1'
+    'Right'
+  when '2'
+    'Left'
+  else
+    'Normal'
   end
 end
 
@@ -61,11 +77,13 @@ get '/thumb/*' do
 end
 
 get '/conv/*' do
-  queue.push({:file => TOP + '/' + params[:splat].first, :transpose => params[:transpose]})
+  q = {:file => params[:splat].first, :transpose => params[:transpose]}
+  queue.push(q)
+  queue_list.push(q)
   redirect back
 end
 
 get '/queue' do
-  @queue = queue.instance_variable_get('@que')
+  @queue = queue_list
   haml :queue
 end
