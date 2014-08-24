@@ -7,6 +7,7 @@
     %th File
     %th Image
     %th Transpose
+    %th
   - @queue.each do |q|
     %tr
       %td
@@ -15,3 +16,5 @@
         %img(src="/thumb/#{q[:file]}" width="150")
       %td
         #{transpose_num_to_str(q[:transpose])}
+      %td
+        %a(href="/qdel\?id=#{q[:id]}") delete

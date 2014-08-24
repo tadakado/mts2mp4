@@ -12,7 +12,9 @@ queue = Queue.new
 queue_list = []
 thread = Thread.start do
   while target = queue.pop
-    queue_list.pop
+    id = target[:id]
+    next unless queue_list.find_index {|q| q[:id] == target[:id]}
+    queue_list.select!{|q| q[:id] != target[:id]}
     puts '============================================================'
     puts 'Converting : ' + target[:file]
     puts 'Transpose  : ' + transpose_num_to_str(target[:transpose])
@@ -77,7 +79,7 @@ get '/thumb/*' do
 end
 
 get '/conv/*' do
-  q = {:file => params[:splat].first, :transpose => params[:transpose]}
+  q = {:file => params[:splat].first, :transpose => params[:transpose], :id => Time.new.hash.to_s}
   queue.push(q)
   queue_list.push(q)
   redirect back
@@ -86,4 +88,14 @@ end
 get '/queue' do
   @queue = queue_list
   haml :queue
+end
+
+get '/qdel' do
+  p '########################################################'
+  p params
+  p queue_list
+  queue_list.select! {|q| q[:id] != params[:id]}
+  p queue_list
+  p '########################################################'
+  redirect '/queue'
 end
